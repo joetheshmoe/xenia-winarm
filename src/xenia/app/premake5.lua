@@ -93,7 +93,7 @@ project("xenia-app")
     links({
       "xenia-cpu-backend-x64",
     })
-  filter("architecture:arm64")
+  filter("architecture:arm64 or architecture:ARM64")
     links({
       "xenia-cpu-backend-a64",
     })

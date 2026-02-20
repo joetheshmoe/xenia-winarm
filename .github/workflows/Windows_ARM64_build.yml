@@ -1,0 +1,50 @@
+name: Windows ARM64 build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ canary_experimental, mac-port, main ]
+    paths:
+      - 'src/**'
+      - 'premake5.lua'
+      - 'xenia-build.py'
+      - '.github/workflows/Windows_ARM64_build.yml'
+
+jobs:
+  build:
+    name: Build ARM64
+    runs-on: windows-2025
+    env:
+      POWERSHELL_TELEMETRY_OPTOUT: 1
+    steps:
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+      - name: Setup submodules
+        run: git submodule update --init --depth=1 -j $env:NUMBER_OF_PROCESSORS (Select-String -CaseSensitive '(?<=path = )(?!third_party\/(FidelityFX-(CAS|FSR)|premake-(androidndk|cmake|export-compile-commands))).+' .gitmodules).Matches.Value
+      - uses: actions/setup-python@main
+        with:
+          python-version: '3.x'
+      - name: Build
+        run: python xenia-build.py build --config=Release --arch=arm64 --target=src\xenia-app
+      - name: Prepare artifacts
+        id: prepare_artifacts
+        run: |
+          if (!(Test-Path "build\bin\Windows\Release\xenia_canary.exe")) {
+             echo "::error::Binary not found at build\bin\Windows\Release\xenia_canary.exe"
+             exit 1
+          }
+          robocopy . build\bin\Windows\Release LICENSE /r:0 /w:0
+          mkdir artifacts
+          mkdir artifacts\xenia_canary_arm64
+          copy build\bin\Windows\Release\xenia_canary.exe artifacts\xenia_canary_arm64\
+          if (Test-Path "build\bin\Windows\Release\xenia_canary.pdb") {
+            copy build\bin\Windows\Release\xenia_canary.pdb artifacts\xenia_canary_arm64\
+          }
+          copy build\bin\Windows\Release\LICENSE artifacts\xenia_canary_arm64\
+      - name: Upload xenia canary ARM64 artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: xenia_canary_windows_arm64
+          path: artifacts\xenia_canary_arm64
+          if-no-files-found: error

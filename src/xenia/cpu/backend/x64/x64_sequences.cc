@@ -3278,14 +3278,14 @@ bool SelectSequence(X64Emitter* e, const Instr* i, const Instr** new_tail) {
   } else {
     const InstrKey key(i);
 
-    auto& sequence_table =
+    auto& current_sequence_table =
 #if XE_PLATFORM_MAC
         GetSequenceTable();
 #else
         sequence_table;
 #endif
-    auto it = sequence_table.find(key);
-    if (it != sequence_table.end()) {
+    auto it = current_sequence_table.find(key);
+    if (it != current_sequence_table.end()) {
       if (it->second(*e, i, InstrKey(i))) {
         *new_tail = i->next;
         return true;

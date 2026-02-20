@@ -14,6 +14,7 @@
 // Includes Windows headers, so it goes after platform_win.h.
 #include "third_party/xbyak/xbyak/xbyak_util.h"
 
+#if XE_ARCH_X86_64
 class StartupCpuFeatureCheck {
  public:
   StartupCpuFeatureCheck() {
@@ -44,3 +45,4 @@ class StartupCpuFeatureCheck {
 #pragma warning(suppress : 4073)
 #pragma init_seg(lib)
 static StartupCpuFeatureCheck gStartupAvxCheck;
+#endif

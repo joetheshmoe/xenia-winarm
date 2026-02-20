@@ -72,6 +72,10 @@ if enableMiscSubprojects then
       links({
         "xenia-cpu-backend-x64",
       })
+    filter("architecture:arm64 or architecture:ARM64")
+      links({
+        "xenia-cpu-backend-a64",
+      })
 
   group("src")
   project("xenia-gpu-d3d12-trace-dump")

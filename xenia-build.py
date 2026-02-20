@@ -26,7 +26,7 @@ __author__ = "ben.vanik@gmail.com (Ben Vanik)"
 self_path = os.path.dirname(os.path.abspath(__file__))
 
 
-def normalize_macos_arch(arch):
+def normalize_arch(arch):
     if not arch:
         return None
     arch = arch.lower()
@@ -34,7 +34,7 @@ def normalize_macos_arch(arch):
         return "arm64"
     if arch in ("x86_64", "x64", "x86", "amd64"):
         return "x86_64"
-    raise ValueError(f"Unsupported macOS arch: {arch}")
+    raise ValueError(f"Unsupported arch: {arch}")
 
 
 def is_macos_arm64_host():
@@ -112,9 +112,12 @@ def import_subprocess_environment(args):
                     break
 
 VSVERSION_MINIMUM = 2022
-def import_vs_environment():
+def import_vs_environment(arch="x64"):
     """Finds the installed Visual Studio version and imports
     interesting environment variables into os.environ.
+
+    Args:
+      arch: The architecture to target (x64 or arm64).
 
     Returns:
       A version such as 2022 or None if no installation is found.
@@ -143,10 +146,11 @@ def import_vs_environment():
 
     vsdevcmd_path = os.path.join(install_path, "Common7", "Tools", "VsDevCmd.bat")
     if os.access(vsdevcmd_path, os.X_OK):
-        env_tool_args = [vsdevcmd_path, "-arch=amd64", "-host_arch=amd64", "&&", "set"]
+        env_tool_args = [vsdevcmd_path, f"-arch={arch}", f"-host_arch={arch if arch == 'arm64' else 'amd64'}", "&&", "set"]
     else:
         vcvars_path = os.path.join(install_path, "VC", "Auxiliary", "Build", "vcvarsall.bat")
-        env_tool_args = [vcvars_path, "x64", "&&", "set"]
+        vcvars_arch = "x64" if arch == "x64" or arch == "x86_64" else "arm64"
+        env_tool_args = [vcvars_path, vcvars_arch, "&&", "set"]
 
     if not version:
         return None
@@ -156,7 +160,7 @@ def import_vs_environment():
     return version
 
 
-vs_version = import_vs_environment()
+vs_version = None # Will be initialized in main after parsing args
 
 default_branch = "canary_experimental"
 
@@ -183,11 +187,24 @@ def main():
         sys.exit(1)
 
     # Grab Visual Studio version and execute shell to set up environment.
-    if sys.platform == "win32" and not vs_version:
-        print("WARNING: Visual Studio not found!"
-              "\nBuilding for Windows will not be supported."
-              " Please refer to the building guide:"
-              f"\nhttps://github.com/xenia-canary/xenia-canary/blob/{default_branch}/docs/building.md")
+    if sys.platform == "win32":
+        # Peek at arguments to see if an architecture was specified early.
+        # This is a bit of a hack but necessary to set up MSVC environment correctly.
+        arch = "x64"
+        for i, val in enumerate(sys.argv):
+            if val == "--arch" and i + 1 < len(sys.argv):
+                arch = normalize_arch(sys.argv[i+1])
+                if arch == "x86_64": arch = "x64"
+                break
+        
+        global vs_version
+        vs_version = import_vs_environment(arch=arch)
+
+        if not vs_version:
+            print("WARNING: Visual Studio not found!"
+                  "\nBuilding for Windows will not be supported."
+                  " Please refer to the building guide:"
+                  f"\nhttps://github.com/xenia-canary/xenia-canary/blob/{default_branch}/docs/building.md")
 
     # Setup main argument parser and common arguments.
     parser = ArgumentParser(prog="xenia-build.py")
@@ -857,8 +874,8 @@ class BaseBuildCommand(Command):
             "--target", action="append", default=[],
             help="Builds only the given target(s).")
         self.parser.add_argument(
-            "--arch", type=normalize_macos_arch, default=None,
-            help="macOS architecture: arm64 or x86_64 (aliases: a64/x64/x86)")
+            "--arch", type=normalize_arch, default=None,
+            help="architecture: arm64 or x86_64 (aliases: a64/x64/x86)")
         self.parser.add_argument(
             "--force", action="store_true",
             help="Forces a full rebuild.")
@@ -902,6 +919,10 @@ class BaseBuildCommand(Command):
                     print("WARNING: dxbc2dxil build script not found!")
         if sys.platform == "darwin" and arch == "x86_64":
             premake_args = ["--mac-x86_64"]
+        if sys.platform == "win32" and arch == "arm64":
+            if not premake_args: premake_args = []
+            premake_args.append("--architecture=ARM64")
+        
         if not args["no_premake"]:
             print("- running premake...")
             enable_tests = any(

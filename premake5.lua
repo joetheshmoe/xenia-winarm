@@ -295,9 +295,13 @@ filter("platforms:Windows")
     "_CRT_SECURE_NO_WARNINGS",
     "WIN32",
     "_WIN64=1",
-    "_AMD64=1",
     "IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
   })
+  filter({"platforms:Windows", "architecture:x86_64"})
+    defines({ "_AMD64=1" })
+  filter({"platforms:Windows", "architecture:ARM64"})
+    defines({ "_ARM64=1" })
+  filter("platforms:Windows")
   linkoptions({
     "/ignore:4006",  -- Ignores complaints about empty obj files.
     "/ignore:4221",
@@ -365,7 +369,11 @@ workspace("xenia")
       filter({})
     elseif os.istarget("windows") then
       platforms({"Windows"})
-      architecture("x86_64")
+      filter("architecture:x86_64")
+        architecture("x86_64")
+      filter("architecture:ARM64")
+        architecture("ARM64")
+      filter({})
       -- 10.0.15063.0: ID3D12GraphicsCommandList1::SetSamplePositions.
       -- 10.0.19041.0: D3D12_HEAP_FLAG_CREATE_NOT_ZEROED.
       -- 10.0.22000.0: DWMWA_WINDOW_CORNER_PREFERENCE.
@@ -384,8 +392,10 @@ workspace("xenia")
   include("third_party/FFmpeg/premake5.lua")
   include("third_party/fmt.lua")
   include("third_party/dxilconv.lua")
-  include("third_party/metal-shader-converter.lua")
-  include("third_party/metal-cpp.lua")
+  if os.istarget("macosx") then
+    include("third_party/metal-shader-converter.lua")
+    include("third_party/metal-cpp.lua")
+  end
   include("third_party/glslang-spirv.lua")
   include("third_party/imgui.lua")
   include("third_party/mspack.lua")
