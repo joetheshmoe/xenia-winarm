@@ -121,7 +121,7 @@ project("xenia-app")
       "xenia-helper-sdl",
       "xenia-hid-sdl",
     })
-  filter("architecture:arm64")
+  filter("architecture:arm64 or architecture:ARM64")
     removelinks({
       "xenia-debug-ui",
       "xenia-app-discord",

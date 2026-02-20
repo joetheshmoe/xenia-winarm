@@ -14,7 +14,7 @@
 // Includes Windows headers, so it goes after platform_win.h.
 #include "third_party/xbyak/xbyak/xbyak_util.h"
 
-#if XE_ARCH_X86_64
+#if XE_ARCH_AMD64
 class StartupCpuFeatureCheck {
  public:
   StartupCpuFeatureCheck() {
