@@ -873,7 +873,7 @@ void Value::Permute(Value* src1, Value* src2, TypeName type) {
       perm.u8[i * 2] = v * 2;
       perm.u8[i * 2 + 1] = v * 2 + 1;
     }
-#if XE_ARCH_X86_64
+#if XE_ARCH_AMD64
     auto lod = [](const vec128_t& v) {
       return _mm_loadu_si128((const __m128i*)&v);
     };
