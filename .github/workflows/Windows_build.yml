@@ -1,50 +1,7 @@
 name: Windows build
 
 on:
-  push:
-    paths-ignore:
-      - '.clang-format'
-      - '.drone.star'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.gdbinit'
-      - '.github/*'
-      - '.github/workflows/Linux_build.yml'
-      - '.github/*_TEMPLATE/**'
-      - '*.md'
-      - '*.yml'
-      - '*.txt'
-      - 'docs/**'
-      - 'src/**/*_posix.*'
-      - 'src/**/*_linux.*'
-      - 'src/**/*_gnulinux.*'
-      - 'src/**/*_x11.*'
-      - 'src/**/*_gtk.*'
-      - 'src/**/*_android.*'
-      - 'src/**/*_mac.*'
-      - 'LICENSE'
-  pull_request:
-    paths-ignore:
-      - '.clang-format'
-      - '.drone.star'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.gdbinit'
-      - '.github/*'
-      - '.github/workflows/Linux_build.yml'
-      - '.github/*_TEMPLATE/**'
-      - '*.md'
-      - '*.yml'
-      - '*.txt'
-      - 'docs/**'
-      - 'src/**/*_posix.*'
-      - 'src/**/*_linux.*'
-      - 'src/**/*_gnulinux.*'
-      - 'src/**/*_x11.*'
-      - 'src/**/*_gtk.*'
-      - 'src/**/*_android.*'
-      - 'src/**/*_mac.*'
-      - 'LICENSE'
+  workflow_dispatch:
   workflow_dispatch:
 
 jobs:

@@ -1,44 +1,6 @@
 name: Linux build
 
 on:
-  push:
-    paths-ignore:
-      - '.clang-format'
-      - '.drone.star'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.github/*'
-      - '.github/workflows/Windows_build.yml'
-      - '.github/*_TEMPLATE/**'
-      - '*.bat'
-      - '*.md'
-      - '*.ps1'
-      - '*.txt'
-      - '*.yml'
-      - 'docs/**'
-      - 'src/**/*_windows.*'
-      - 'src/**/*_android.*'
-      - 'src/**/*_mac.*'
-      - 'LICENSE'
-  pull_request:
-    paths-ignore:
-      - '.clang-format'
-      - '.drone.star'
-      - '.gitattributes'
-      - '.gitignore'
-      - '.github/*'
-      - '.github/workflows/Windows_build.yml'
-      - '.github/*_TEMPLATE/**'
-      - '*.bat'
-      - '*.md'
-      - '*.ps1'
-      - '*.txt'
-      - '*.yml'
-      - 'docs/**'
-      - 'src/**/*_windows.*'
-      - 'src/**/*_android.*'
-      - 'src/**/*_mac.*'
-      - 'LICENSE'
   workflow_dispatch:
 
 jobs:
