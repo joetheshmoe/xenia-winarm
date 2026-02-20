@@ -13,7 +13,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#if XE_ARCH_X86_64
+#if XE_ARCH_AMD64
 #include <immintrin.h>
 #endif
 
