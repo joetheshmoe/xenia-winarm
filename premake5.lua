@@ -9,7 +9,6 @@ if _ACTION == "cmake" then
   require("third_party/premake-cmake/cmake")
 end
 
-location(build_root)
 targetdir(build_bin)
 objdir(build_obj)
 
@@ -334,6 +333,7 @@ if not os.isdir("scratch") then
 end
 
 workspace("xenia")
+  location(build_root)
   uuid("931ef4b0-6170-4f7a-aaf2-0fece7632747")
   startproject("xenia-app")
   if os.istarget("android") then
@@ -374,6 +374,7 @@ workspace("xenia")
     elseif os.istarget("windows") then
       platforms({"Windows"})
       local target_arch = _OPTIONS["arch"] or "x86_64"
+      if target_arch == "arm64" then target_arch = "ARM64" end
       architecture(target_arch)
       filter({})
       -- 10.0.15063.0: ID3D12GraphicsCommandList1::SetSamplePositions.
