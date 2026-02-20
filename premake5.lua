@@ -22,6 +22,10 @@ newoption({
   trigger = "mac-x86_64",
   description = "Enable x86_64 platform on macOS ARM64 hosts",
 })
+newoption({
+  trigger = "arch",
+  description = "Target architecture",
+})
 
 enableTests = _OPTIONS["tests"] ~= nil
 enableMiscSubprojects = os.istarget("macosx")
@@ -369,10 +373,8 @@ workspace("xenia")
       filter({})
     elseif os.istarget("windows") then
       platforms({"Windows"})
-      filter("architecture:x86_64")
-        architecture("x86_64")
-      filter("architecture:ARM64")
-        architecture("ARM64")
+      local target_arch = _OPTIONS["arch"] or "x86_64"
+      architecture(target_arch)
       filter({})
       -- 10.0.15063.0: ID3D12GraphicsCommandList1::SetSamplePositions.
       -- 10.0.19041.0: D3D12_HEAP_FLAG_CREATE_NOT_ZEROED.

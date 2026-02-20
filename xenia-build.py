@@ -921,14 +921,17 @@ class BaseBuildCommand(Command):
             premake_args = ["--mac-x86_64"]
         if sys.platform == "win32" and arch == "arm64":
             if not premake_args: premake_args = []
-            premake_args.append("--architecture=ARM64")
+            premake_args.append("--arch=arm64")
         
         if not args["no_premake"]:
             print("- running premake...")
             enable_tests = any(
                 target.endswith("-tests") for target in (args["target"] or []))
-            run_platform_premake(cc=args["cc"], enable_tests=enable_tests,
-                                 extra_premake_args=premake_args)
+            ret = run_platform_premake(cc=args["cc"], enable_tests=enable_tests,
+                                       extra_premake_args=premake_args)
+            if ret != 0:
+                print("ERROR: premake failed with one or more errors.")
+                return ret
             print("")
 
         print("- building (%s):%s..." % (
