@@ -64,5 +64,12 @@ project("zlib-ng")
     end
   end
   if zlibng_build then
-    os.execute("cmake -DZLIB_ENABLE_TESTS=OFF -DWITH_GTEST=OFF "..zlibng_dir.." -B"..zlibng_dir)
+    local cmake_args = "-DZLIB_ENABLE_TESTS=OFF -DWITH_GTEST=OFF"
+    local target_arch = _OPTIONS["arch"] or os.targetarch()
+    if os.istarget("windows") then
+      if target_arch == "arm64" or target_arch == "ARM64" then
+        cmake_args = cmake_args .. " -A ARM64"
+      end
+    end
+    os.execute("cmake " .. cmake_args .. " " .. zlibng_dir .. " -B" .. zlibng_dir)
   end
